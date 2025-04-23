@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -22,6 +24,24 @@ android {
         includeInApk = false
         // Disables dependency metadata when building Android App Bundles.
         includeInBundle = false
+    }
+
+    signingConfigs {
+        create("release") {
+            file("../signing.properties").let { propFile ->
+                if (propFile.canRead()) {
+                    val properties = Properties()
+                    properties.load(propFile.inputStream())
+
+                    storeFile = file(properties.getProperty("KEYSTORE_FILE"))
+                    storePassword = properties.getProperty("KEYSTORE_PASSWORD")
+                    keyAlias = properties.getProperty("SIGNING_KEY_ALIAS")
+                    keyPassword = properties.getProperty("SIGNING_KEY_PASSWORD")
+                } else {
+                    println("Unable to read signing.properties")
+                }
+            }
+        }
     }
 
     buildTypes {
