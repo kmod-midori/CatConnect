@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ANCS 接收器</string>
+    <string name="enable_service">启用服务</string>
+    <string name="enable_service_desc">在本设备上接收来自 iOS 设备的通知。</string>
+    <string name="bluetooth_disabled">蓝牙已关闭或不可用</string>
+    <string name="connected">已连接</string>
+    <string name="connected_with_batt">已连接 %d%%</string>
+    <string name="not_connected">未连接</string>
+    <string name="stop">停止</string>
+    <string name="bluetooth_not_granted">未授予蓝牙相关权限</string>
+    <string name="failed_to_list_devices">获取已配对设备列表失败</string>
+    <string name="perm_required">需要授权</string>
+    <string name="perm_required_desc">一个或多个必要权限未授予，本应用可能无法正常工作。点击以授予权限。</string>
+    <string name="pair_dialog_title">配对新设备</string>
+    <string name="pair_dialog_text">请打开 iOS 设备的蓝牙设置，并将 iOS 设备与本设备配对。点击“确认”打开本设备的蓝牙设置。</string>
+    <string name="paired_devices">已配对的设备</string>
+    <string name="fwd_group_desc">转发通知</string>
+    <string name="setup_connecting">正在连接</string>
+    <string name="setup_info">正在收集设备信息</string>
+    <string name="setup_done">设备配置完成，可以使用</string>
+    <string name="not_selected">未选择设备</string>
+</resources>

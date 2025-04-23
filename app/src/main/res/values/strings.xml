@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">ANCS Receiver</string>
+    <string name="enable_service">Enable Service</string>
+    <string name="enable_service_desc">Receive notifications from iOS devices on this device.</string>
+    <string name="bluetooth_disabled">Bluetooth is disabled or unavailable.</string>
+    <string name="connected">Connected</string>
+    <string name="connected_with_batt">Connected %d%%</string>
+    <string name="not_connected">Not Connected</string>
+    <string name="stop">Stop</string>
+    <string name="bluetooth_not_granted">Bluetooth-related permissions not granted</string>
+    <string name="failed_to_list_devices">Failed to list bonded devices</string>
+    <string name="perm_required">Permissions Required</string>
+    <string name="perm_required_desc">One or more required permissions not granted, the app might not function normally. Click to grant these permissions.</string>
+    <string name="pair_dialog_title">Pair a New Device</string>
+    <string name="pair_dialog_text">Open Bluetooth settings on your iOS device, and pair your iOS device with this device in settings. Tap \"OK\" to open Bluetooth settings of this device.</string>
+    <string name="paired_devices">Paired Devices</string>
+    <string name="fwd_group_desc">Forwarded Notifications</string>
+    <string name="setup_connecting">Connecting</string>
+    <string name="setup_info">Gathering device information</string>
+    <string name="setup_done">Device configured and available for use</string>
+    <string name="not_selected">Device not selected</string>
+</resources>
