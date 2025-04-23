@@ -1,4 +1,4 @@
-package moe.reimu.ancsreceiver
+package moe.reimu.ancsreceiver.services
 
 import android.annotation.SuppressLint
 import android.app.PendingIntent
@@ -10,6 +10,8 @@ import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import android.util.Log
+import moe.reimu.ancsreceiver.ServiceState
+import moe.reimu.ancsreceiver.StartReceiverActivity
 import moe.reimu.ancsreceiver.utils.BROADCAST_PERMISSION
 import java.lang.ref.WeakReference
 import kotlin.random.Random
@@ -34,8 +36,8 @@ class ReceiverTileService : TileService() {
     @Suppress("DEPRECATION")
     override fun onClick() {
         val intent = when (qsTile.state) {
-            Tile.STATE_ACTIVE -> StartReceiverActivity.getIntent(this, true)
-            Tile.STATE_INACTIVE -> StartReceiverActivity.getIntent(this, false)
+            Tile.STATE_ACTIVE -> StartReceiverActivity.Companion.getIntent(this, true)
+            Tile.STATE_INACTIVE -> StartReceiverActivity.Companion.getIntent(this, false)
             else -> null
         }
 
@@ -47,7 +49,7 @@ class ReceiverTileService : TileService() {
                 startActivityAndCollapse(
                     PendingIntent.getActivity(
                         this,
-                        Random.nextInt(),
+                        Random.Default.nextInt(),
                         intent,
                         PendingIntent.FLAG_IMMUTABLE
                     )
@@ -77,7 +79,7 @@ class ReceiverTileService : TileService() {
             r, IntentFilter().apply {
                 addAction(ServiceState.ACTION_UPDATE_RECEIVER_STATE)
             }, BROADCAST_PERMISSION, null, if (Build.VERSION.SDK_INT >= 33) {
-                Context.RECEIVER_EXPORTED
+                RECEIVER_EXPORTED
             } else {
                 0
             }

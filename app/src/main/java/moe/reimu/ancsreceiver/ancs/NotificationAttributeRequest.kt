@@ -1,6 +1,6 @@
 package moe.reimu.ancsreceiver.ancs
 
-import moe.reimu.ancsreceiver.AncsConstants
+import moe.reimu.ancsreceiver.ancs.AncsConstants
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.Arrays

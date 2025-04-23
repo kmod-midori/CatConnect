@@ -1,7 +1,7 @@
 package moe.reimu.ancsreceiver.ancs
 
 import android.bluetooth.BluetoothGattCharacteristic
-import moe.reimu.ancsreceiver.BleDevice
+import moe.reimu.ancsreceiver.ble.BleDevice
 import java.util.UUID
 
 class AncsBleService(device: BleDevice) {

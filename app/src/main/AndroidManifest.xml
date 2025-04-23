@@ -59,7 +59,7 @@
                 android:value="ongoing|silent" />
         </service>
         <service
-            android:name=".ReceiverTileService"
+            android:name=".services.ReceiverTileService"
             android:enabled="true"
             android:exported="true"
             android:icon="@drawable/baseline_phonelink"

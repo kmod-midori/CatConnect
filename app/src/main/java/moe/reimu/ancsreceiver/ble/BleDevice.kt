@@ -1,4 +1,4 @@
-package moe.reimu.ancsreceiver
+package moe.reimu.ancsreceiver.ble
 
 import android.Manifest
 import android.bluetooth.BluetoothDevice
@@ -7,8 +7,6 @@ import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothGattService
-import android.bluetooth.BluetoothManager
-import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.util.Log
 import androidx.annotation.RequiresPermission
@@ -16,11 +14,9 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.cancel
-import java.util.UUID
 import java.io.Closeable
+import java.util.UUID
 
 class BleDevice(private val nativeDevice: BluetoothDevice) : Closeable {
     private val TAG = "BleDevice"

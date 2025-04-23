@@ -1,4 +1,4 @@
-package moe.reimu.ancsreceiver
+package moe.reimu.ancsreceiver.ancs
 
 object AncsConstants {
     const val NotificationAttributeIDAppIdentifier: Byte = 0

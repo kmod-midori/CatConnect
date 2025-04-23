@@ -47,8 +47,8 @@ import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeout
-import moe.reimu.ancsreceiver.AncsConstants
-import moe.reimu.ancsreceiver.BleDevice
+import moe.reimu.ancsreceiver.ancs.AncsConstants
+import moe.reimu.ancsreceiver.ble.BleDevice
 import moe.reimu.ancsreceiver.BuildConfig
 import moe.reimu.ancsreceiver.MyApplication
 import moe.reimu.ancsreceiver.R

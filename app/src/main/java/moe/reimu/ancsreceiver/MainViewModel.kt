@@ -12,6 +12,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import moe.reimu.ancsreceiver.ancs.AncsBleService
+import moe.reimu.ancsreceiver.ble.BleDevice
 
 class MainViewModel(app: Application) : AndroidViewModel(app) {
     private val appContext = app as MyApplication

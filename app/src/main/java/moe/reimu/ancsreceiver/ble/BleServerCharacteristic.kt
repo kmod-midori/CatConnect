@@ -3,7 +3,7 @@ package moe.reimu.ancsreceiver.ble
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
-import moe.reimu.ancsreceiver.BleDevice
+import moe.reimu.ancsreceiver.ble.BleDevice
 import java.util.UUID
 
 class BleServerCharacteristic(

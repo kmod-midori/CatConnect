@@ -18,7 +18,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import moe.reimu.ancsreceiver.BleDevice
+import moe.reimu.ancsreceiver.ble.BleDevice
 import moe.reimu.ancsreceiver.services.ServerService
 import java.io.Closeable
 import java.util.UUID
