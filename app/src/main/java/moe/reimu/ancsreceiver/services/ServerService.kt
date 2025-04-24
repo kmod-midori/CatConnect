@@ -97,7 +97,7 @@ class ServerService : NotificationListenerService() {
         }
 
         if (!btAdapter.isEnabled) {
-            Log.i(TAG, "Bluetooth is disabled")
+            Log.w(TAG, "Bluetooth is disabled")
             return
         }
 
@@ -200,7 +200,7 @@ class ServerService : NotificationListenerService() {
         device: BluetoothDevice,
         request: NotificationAttributeRequest
     ) {
-        Log.i(TAG, "Notification attribute request from $device: $request")
+        Log.d(TAG, "Notification attribute request from $device: $request")
         if (!isConnected) {
             Log.w(TAG, "Listener is not connected, ignoring request")
             return
