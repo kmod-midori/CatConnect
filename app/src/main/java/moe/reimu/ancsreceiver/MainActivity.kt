@@ -8,8 +8,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -33,6 +33,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AlertDialogDefaults
@@ -69,6 +70,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import kotlinx.coroutines.launch
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -76,6 +78,7 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import moe.reimu.ancsreceiver.services.AncsService
 import moe.reimu.ancsreceiver.ui.theme.ANCSReceiverTheme
 import moe.reimu.ancsreceiver.utils.getReceiverFlags
+import moe.reimu.ancsreceiver.utils.getRequiredPermissions
 import moe.reimu.ancsreceiver.utils.registerInternalBroadcastReceiver
 
 class MainActivity : ComponentActivity() {
@@ -93,22 +96,9 @@ data class BondedDevice(val device: BluetoothDevice, val name: String)
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MainActivityContent(mainViewModel: MainViewModel = viewModel()) {
-    val iconMod = Modifier
-        .size(48.dp)
-        .padding(end = 16.dp)
-
     val context = LocalContext.current
 
-    val requiredBtPermissions = mutableListOf(
-        Manifest.permission.BLUETOOTH_SCAN,
-        Manifest.permission.BLUETOOTH_CONNECT,
-    )
-    if (Build.VERSION.SDK_INT <= 32) {
-        requiredBtPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION)
-    }
-    if (Build.VERSION.SDK_INT >= 33) {
-        requiredBtPermissions.add(Manifest.permission.POST_NOTIFICATIONS)
-    }
+    val requiredBtPermissions = getRequiredPermissions()
     val permissions = rememberMultiplePermissionsState(requiredBtPermissions)
 
     val isPreview = LocalInspectionMode.current
@@ -186,11 +176,7 @@ fun MainActivityContent(mainViewModel: MainViewModel = viewModel()) {
                             modifier = Modifier.padding(16.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Icon(
-                                imageVector = Icons.Filled.Notifications,
-                                contentDescription = null,
-                                modifier = iconMod,
-                            )
+                            MyIcon(Icons.Filled.Notifications)
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = stringResource(R.string.enable_service),
@@ -200,9 +186,16 @@ fun MainActivityContent(mainViewModel: MainViewModel = viewModel()) {
                                     text = stringResource(R.string.enable_service_desc),
                                 )
                             }
-                            ServiceSwitch(enabled = permissions.allPermissionsGranted && currentDeviceAddress != null)
+                            ServiceSwitch(
+                                modifier = Modifier.padding(start = 8.dp),
+                                enabled = permissions.allPermissionsGranted && currentDeviceAddress != null
+                            )
                         }
                     }
+                }
+
+                item {
+                    ServerServiceCard()
                 }
 
                 if (!permissions.allPermissionsGranted) {
@@ -214,11 +207,7 @@ fun MainActivityContent(mainViewModel: MainViewModel = viewModel()) {
                                 modifier = Modifier.padding(16.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Warning,
-                                    contentDescription = null,
-                                    modifier = iconMod,
-                                )
+                                MyIcon(Icons.Filled.Warning)
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
                                         stringResource(R.string.perm_required),
@@ -271,11 +260,7 @@ fun MainActivityContent(mainViewModel: MainViewModel = viewModel()) {
                                 modifier = Modifier.padding(16.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                Icon(
-                                    imageVector = ImageVector.vectorResource(R.drawable.baseline_phone_iphone),
-                                    contentDescription = null,
-                                    modifier = iconMod,
-                                )
+                                MyIcon(ImageVector.vectorResource(R.drawable.baseline_phone_iphone))
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
                                         text = device.name,
@@ -301,11 +286,7 @@ fun MainActivityContent(mainViewModel: MainViewModel = viewModel()) {
                                 modifier = Modifier.padding(16.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Warning,
-                                    contentDescription = null,
-                                    modifier = iconMod,
-                                )
+                                MyIcon(Icons.Filled.Warning)
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
                                         stringResource(btErrorMessage!!),
@@ -348,6 +329,17 @@ fun MainActivityContent(mainViewModel: MainViewModel = viewModel()) {
 @Preview(locale = "zh-rCN")
 fun MainActivityPreview() {
     MainActivityContent()
+}
+
+@Composable
+fun MyIcon(imageVector: ImageVector) {
+    Icon(
+        imageVector = imageVector,
+        contentDescription = null,
+        modifier = Modifier
+            .size(48.dp)
+            .padding(end = 16.dp),
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -447,7 +439,7 @@ fun SetupProgressDialog(onDismissRequest: () -> Unit, progressText: String) {
 }
 
 @Composable
-fun ServiceSwitch(enabled: Boolean) {
+fun ServiceSwitch(modifier: Modifier = Modifier, enabled: Boolean) {
     val context = LocalContext.current
 
     var checked by remember { mutableStateOf(false) }
@@ -472,12 +464,54 @@ fun ServiceSwitch(enabled: Boolean) {
         }
     }
 
-    Switch(checked = checked, onCheckedChange = {
+    Switch(modifier = modifier, checked = checked, onCheckedChange = {
         if (it) {
             AncsService.start(context)
         } else {
             AncsService.stop(context)
         }
     }, enabled = enabled)
+}
+
+@Composable
+fun ServerServiceCard() {
+    val context = LocalContext.current
+    var enabled by remember { mutableStateOf(false) }
+
+    LifecycleResumeEffect(context) {
+        val enabledListeners = Settings.Secure.getString(
+            context.contentResolver, "enabled_notification_listeners"
+        )
+        enabled = enabledListeners.contains(context.packageName)
+
+        onPauseOrDispose { }
+    }
+
+    DefaultCard(onClick = {
+        val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(intent)
+    }) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            MyIcon(Icons.Filled.Share)
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    stringResource(R.string.server_service_name),
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(stringResource(R.string.server_service_desc))
+            }
+            Text(
+                text = if (enabled) {
+                    stringResource(R.string.service_enabled)
+                } else {
+                    stringResource(R.string.service_disabled)
+                }, modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+    }
 }
 

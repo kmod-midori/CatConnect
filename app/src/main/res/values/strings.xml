@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ANCS Receiver</string>
+    <string name="app_name" translatable="false">CatConnect</string>
     <string name="enable_service">Enable Service</string>
     <string name="enable_service_desc">Receive notifications from iOS devices on this device.</string>
     <string name="bluetooth_disabled">Bluetooth is disabled or unavailable.</string>
@@ -18,5 +18,9 @@
     <string name="setup_connecting">Connecting</string>
     <string name="setup_info">Gathering device information</string>
     <string name="setup_done">Device configured and available for use</string>
-    <string name="not_selected">Device not selected</string>
+    <string name="device_not_selected">Device not selected</string>
+    <string name="service_disabled">Disabled</string>
+    <string name="service_enabled">Enabled</string>
+    <string name="server_service_name">Share notifications to paired devices</string>
+    <string name="server_service_desc">Share notifications on this device to other compatible paired devices</string>
 </resources>

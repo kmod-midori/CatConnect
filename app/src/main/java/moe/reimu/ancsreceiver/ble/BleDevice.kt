@@ -64,7 +64,7 @@ class BleDevice(private val nativeDevice: BluetoothDevice) : Closeable {
 
         override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.i(TAG, "onServicesDiscovered: SUCCESS")
+                Log.d(TAG, "onServicesDiscovered: SUCCESS")
                 servicesFuture.complete(Unit)
             } else {
                 Log.e(TAG, "onServicesDiscovered: $status")
@@ -82,7 +82,7 @@ class BleDevice(private val nativeDevice: BluetoothDevice) : Closeable {
         ) {
             synchronized(readEvents) {
                 if (status == BluetoothGatt.GATT_SUCCESS) {
-                    Log.i(TAG, "onCharacteristicRead(${characteristic.uuid}): SUCCESS")
+                    Log.d(TAG, "onCharacteristicRead(${characteristic.uuid}): SUCCESS")
                     readEvents.remove(characteristic)?.forEach {
                         it.complete(value)
                     }
@@ -101,7 +101,7 @@ class BleDevice(private val nativeDevice: BluetoothDevice) : Closeable {
             status: Int
         ) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.i(TAG, "onCharacteristicWrite(${characteristic.uuid}): SUCCESS")
+                Log.d(TAG, "onCharacteristicWrite(${characteristic.uuid}): SUCCESS")
                 writeEvents.remove(characteristic)?.complete(Unit)
             } else {
                 Log.e(TAG, "onCharacteristicWrite(${characteristic.uuid}): $status")

@@ -38,6 +38,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -71,6 +72,7 @@ import moe.reimu.ancsreceiver.utils.getReceiverFlags
 import moe.reimu.ancsreceiver.utils.readTlvAsMap
 import moe.reimu.ancsreceiver.utils.registerInternalBroadcastReceiver
 import moe.reimu.ancsreceiver.utils.showBluetoothToast
+import moe.reimu.ancsreceiver.utils.EXTRA_DEVICE_ADDRESS
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.UUID
@@ -78,6 +80,7 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.coroutineContext
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 class AncsService : Service() {
     private lateinit var btManager: BluetoothManager
@@ -171,7 +174,7 @@ class AncsService : Service() {
 
         val targetDeviceAddress = MyApplication.Companion.getInstance().getSettings().deviceAddress
         if (targetDeviceAddress == null) {
-            Toast.makeText(this, R.string.not_selected, Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.device_not_selected, Toast.LENGTH_SHORT).show()
             stopSelf()
             return
         }
@@ -234,8 +237,7 @@ class AncsService : Service() {
             while (true) {
                 try {
                     mainTask(targetDevice)
-                } catch (_: CancellationException) {
-                    Log.i(TAG, "Main task cancelled")
+                } catch (_: ServiceDestroyedException) {
                     break
                 } catch (e: Throwable) {
                     Log.e(TAG, "Main task failed", e)
@@ -341,7 +343,7 @@ class AncsService : Service() {
 
                         val extras = Bundle().apply {
                             putString("ancs.appId", appId)
-                            putString("ancs.deviceAddress", bleDevice.address)
+                            putString(EXTRA_DEVICE_ADDRESS, bleDevice.address)
                             putString("ancs.origTitle", title)
                             putInt("ancs.uid", uid)
 
@@ -775,8 +777,6 @@ class AncsService : Service() {
                 withTimeout(5.minutes) {
                     bleDevice.connect(this@AncsService, true)
                 }
-                bleDevice.requestMtu(512)
-                bleDevice.discoverServices()
                 Log.i(TAG, "Connected to $device")
 
                 val stateFlow = bleDevice.connectionStateFlow
@@ -790,11 +790,16 @@ class AncsService : Service() {
                     }
                 }
 
-                val initialBatteryLevel = handleBattery(bleDevice, flowScope)
-                handleAncs(bleDevice, flowScope)
-                handleAms(bleDevice, flowScope)
+                withTimeout(10.seconds) {
+                    bleDevice.requestMtu(512)
+                    bleDevice.discoverServices()
 
-                updateConnectedNotification(bleDevice.name, initialBatteryLevel)
+                    val initialBatteryLevel = handleBattery(bleDevice, flowScope)
+                    handleAncs(bleDevice, flowScope)
+                    handleAms(bleDevice, flowScope)
+                    updateConnectedNotification(bleDevice.name, initialBatteryLevel)
+                }
+
                 Log.i(TAG, "Setup complete")
 
                 select {
@@ -920,6 +925,8 @@ class AncsService : Service() {
         return builder.build()
     }
 
+    private class ServiceDestroyedException : CancellationException("Service destroyed")
+
     @OptIn(DelicateCoroutinesApi::class)
     @SuppressLint("MissingPermission")
     override fun onDestroy() {
@@ -937,7 +944,7 @@ class AncsService : Service() {
             }
         }
 
-        mainTask?.cancel()
+        mainTask?.cancel(ServiceDestroyedException())
     }
 
     companion object {

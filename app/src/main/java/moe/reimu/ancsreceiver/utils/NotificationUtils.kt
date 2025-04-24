@@ -13,6 +13,7 @@ const val NOTI_ID_PERSIST = 10
 const val NOTI_ID_FWD_BASE = 20
 const val NOTI_ID_MEDIA = 8
 const val GROUP_ID_FWD = "fwd"
+const val EXTRA_DEVICE_ADDRESS = "ancs.deviceAddress"
 
 fun createChannels(context: Context) {
     val manager = NotificationManagerCompat.from(context)

@@ -23,6 +23,7 @@ import moe.reimu.ancsreceiver.ble.BleServerService
 import moe.reimu.ancsreceiver.utils.checkPermissions
 import moe.reimu.ancsreceiver.utils.readNullTerminatedString
 import moe.reimu.ancsreceiver.utils.showBluetoothToast
+import moe.reimu.ancsreceiver.utils.EXTRA_DEVICE_ADDRESS
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
@@ -147,10 +148,10 @@ class ServerService : NotificationListenerService() {
             uid = uid
         )
 
-        val srcDeviceAddress = sbn.notification.extras.getString("ancs.deviceAddress")
+        val srcDeviceAddress = sbn.notification.extras.getString(EXTRA_DEVICE_ADDRESS)
 
         serviceScope.launch {
-            bleServer?.notifyAllDevices(dataSource.uuid, event.toByteArray(), srcDeviceAddress)
+            bleServer?.notifyAllDevices(notificationSource.uuid, event.toByteArray(), srcDeviceAddress)
         }
     }
 
@@ -176,10 +177,10 @@ class ServerService : NotificationListenerService() {
             uid = uid
         )
 
-        val srcDeviceAddress = sbn.notification.extras.getString("ancs.deviceAddress")
+        val srcDeviceAddress = sbn.notification.extras.getString(EXTRA_DEVICE_ADDRESS)
 
         serviceScope.launch {
-            bleServer?.notifyAllDevices(dataSource.uuid, event.toByteArray(), srcDeviceAddress)
+            bleServer?.notifyAllDevices(notificationSource.uuid, event.toByteArray(), srcDeviceAddress)
         }
     }
 
@@ -222,61 +223,52 @@ class ServerService : NotificationListenerService() {
         responseBuffer.putInt(request.uid)
 
         for (attr in request.attributes) {
-            responseBuffer.put(attr.id)
-            when (attr.id) {
+            val attrValue = when (attr.id) {
                 AncsConstants.NotificationAttributeIDAppIdentifier -> {
-                    val appId = sbn.packageName.toByteArray()
-                    responseBuffer.putShort(appId.size.toShort())
-                    responseBuffer.put(appId)
+                    sbn.packageName
                 }
 
                 AncsConstants.NotificationAttributeIDTitle -> {
                     val titleString = sbn.notification.extras?.getString("android.title") ?: ""
-                    val truncated = truncateUtf8String(
+                    truncateUtf8String(
                         titleString,
                         attr.lengthLimit?.toInt() ?: 0
-                    ).encodeToByteArray()
-                    responseBuffer.putShort(truncated.size.toShort())
-                    responseBuffer.put(truncated)
+                    )
                 }
 
                 AncsConstants.NotificationAttributeIDSubtitle -> {
-                    val subtitleString =
-                        sbn.notification.extras?.getString("android.subText") ?: ""
-                    val truncated =
-                        truncateUtf8String(
-                            subtitleString,
-                            attr.lengthLimit?.toInt() ?: 0
-                        ).encodeToByteArray()
-                    responseBuffer.putShort(truncated.size.toShort())
-                    responseBuffer.put(truncated)
+                    val subtitleString = sbn.notification.extras?.getString("android.subText") ?: ""
+                    truncateUtf8String(
+                        subtitleString,
+                        attr.lengthLimit?.toInt() ?: 0
+                    )
                 }
 
                 AncsConstants.NotificationAttributeIDMessage -> {
-                    val messageString =
-                        sbn.notification.extras?.getString("android.text") ?: ""
-                    val truncated =
-                        truncateUtf8String(
-                            messageString,
-                            attr.lengthLimit?.toInt() ?: 0
-                        ).encodeToByteArray()
-                    responseBuffer.putShort(truncated.size.toShort())
-                    responseBuffer.put(truncated)
+                    val messageString = sbn.notification.extras?.getString("android.text") ?: ""
+                    truncateUtf8String(
+                        messageString,
+                        attr.lengthLimit?.toInt() ?: 0
+                    )
                 }
 
                 AncsConstants.NotificationAttributeIDPositiveActionLabel -> {
-                    responseBuffer.putShort(0)
+                    ""
                 }
 
                 AncsConstants.NotificationAttributeIDNegativeActionLabel -> {
-                    responseBuffer.putShort(0)
+                    ""
                 }
 
                 else -> {
                     Log.w(TAG, "Unknown attribute ID: ${attr.id}")
-                    responseBuffer.putShort(0)
+                    ""
                 }
             }
+            val attrRaw = attrValue.encodeToByteArray()
+            responseBuffer.put(attr.id)
+            responseBuffer.putShort(attrRaw.size.toShort())
+            responseBuffer.put(attrRaw)
         }
 
         val response = responseBuffer.array().copyOf(responseBuffer.position())

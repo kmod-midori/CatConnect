@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ANCS 接收器</string>
     <string name="enable_service">启用服务</string>
     <string name="enable_service_desc">在本设备上接收来自 iOS 设备的通知。</string>
     <string name="bluetooth_disabled">蓝牙已关闭或不可用</string>
@@ -19,5 +18,9 @@
     <string name="setup_connecting">正在连接</string>
     <string name="setup_info">正在收集设备信息</string>
     <string name="setup_done">设备配置完成，可以使用</string>
-    <string name="not_selected">未选择设备</string>
+    <string name="device_not_selected">未选择设备</string>
+    <string name="service_disabled">已禁用</string>
+    <string name="service_enabled">已启用</string>
+    <string name="server_service_name">向已配对的设备共享通知</string>
+    <string name="server_service_desc">向已配对的兼容设备共享本设备的通知</string>
 </resources>

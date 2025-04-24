@@ -39,14 +39,12 @@ class BleServer: Closeable {
 
     private val _connectionStateFlow = MutableSharedFlow<ConnectionState>()
 
-    class ConnectionInfo() {
+    private class ConnectionInfo() {
         val enabledNotifications = mutableMapOf<UUID, Boolean>()
+        var preparedWrite: PreparedWrite? = null
     }
 
     private val connections = mutableMapOf<BluetoothDevice, ConnectionInfo>()
-
-    val connectedDevices
-        get() = connections.keys
 
     private class GattServerContext(
         val device: BluetoothDevice,
@@ -87,6 +85,8 @@ class BleServer: Closeable {
                         Log.i(TAG, "Device disconnected: $device")
                         connections.remove(device)
                     }
+
+                    else -> {}
                 }
             }
         }
@@ -138,6 +138,8 @@ class BleServer: Closeable {
             val bleCharacteristic =
                 ensureCharacteristic(context, descriptor.characteristic.uuid) ?: return
 
+            val logPrefix = "onDescriptorWriteRequest($device, ${descriptor.characteristic.uuid}):"
+
             if (device.bondState != BluetoothDevice.BOND_BONDED) {
                 sendError(context, BluetoothGatt.GATT_REQUEST_NOT_SUPPORTED)
                 return
@@ -149,28 +151,19 @@ class BleServer: Closeable {
             }
 
             if (offset != 0) {
-                Log.w(
-                    TAG,
-                    "onDescriptorWriteRequest($device, ${descriptor.characteristic}): offset != 0"
-                )
+                Log.w(TAG, "$logPrefix offset != 0")
                 sendError(context, BluetoothGatt.GATT_INVALID_OFFSET)
                 return
             }
 
             val enabled = when (value[0]) {
                 BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE[0] -> {
-                    Log.i(
-                        TAG,
-                        "onDescriptorWriteRequest($device, ${descriptor.characteristic.uuid}): Notification enabled"
-                    )
+                    Log.d(TAG, "$logPrefix Notification enabled")
                     true
                 }
 
                 BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE[0] -> {
-                    Log.i(
-                        TAG,
-                        "onDescriptorWriteRequest($device, ${descriptor.characteristic.uuid}): Notification disabled"
-                    )
+                    Log.d(TAG, "$logPrefix Notification disabled")
                     false
                 }
 
@@ -195,8 +188,6 @@ class BleServer: Closeable {
             }
         }
 
-        private val preparedWrites = mutableMapOf<BluetoothDevice, PreparedWrite>()
-
         override fun onCharacteristicWriteRequest(
             device: BluetoothDevice,
             requestId: Int,
@@ -207,33 +198,35 @@ class BleServer: Closeable {
             value: ByteArray
         ) {
             val context = GattServerContext(device, requestId, responseNeeded, offset)
-            ensureConnection(context) ?: return
+            val conn = ensureConnection(context) ?: return
             val bleCharacteristic = ensureCharacteristic(context, characteristic.uuid) ?: return
 
+            val logPrefix = "onCharacteristicWriteRequest($device, $characteristic):"
+
             if (device.bondState != BluetoothDevice.BOND_BONDED) {
-                Log.w(
-                    TAG,
-                    "onCharacteristicWriteRequest($device, $characteristic): device not bonded"
-                )
+                Log.w(TAG, "$logPrefix device not bonded")
                 sendError(context, BluetoothGatt.GATT_REQUEST_NOT_SUPPORTED)
                 return
             }
 
             if (bleCharacteristic.onWrite == null) {
-                Log.w(
-                    TAG,
-                    "onCharacteristicWriteRequest($device, $characteristic): characteristic does not support write"
-                )
+                Log.w(TAG, "$logPrefix characteristic does not support write")
                 sendError(context, BluetoothGatt.GATT_REQUEST_NOT_SUPPORTED)
                 return
             }
 
             if (preparedWrite) {
                 // Queue the write fragment
-                val write = preparedWrites.getOrPut(device) { PreparedWrite(bleCharacteristic) }
+                Log.d(TAG, "$logPrefix prepared write, offset = $offset, length = ${value.size}")
+                val write = synchronized(conn) {
+                    val p = conn.preparedWrite ?: PreparedWrite(bleCharacteristic)
+                    conn.preparedWrite = p
+                    p
+                }
                 write.segments.add(offset to value)
             } else {
                 // Immediate write: process directly
+                Log.d(TAG, "$logPrefix immediate write, length = ${value.size}")
                 bleCharacteristic.onWrite.invoke(device, value)
             }
 
@@ -250,10 +243,15 @@ class BleServer: Closeable {
 
         override fun onExecuteWrite(device: BluetoothDevice, requestId: Int, execute: Boolean) {
             val context = GattServerContext(device, requestId, true, 0)
-            ensureConnection(context) ?: return
+            val conn = ensureConnection(context) ?: return
+
+            val write = synchronized(conn) {
+                val w = conn.preparedWrite
+                conn.preparedWrite = null
+                w
+             }
 
             if (execute) {
-                val write = preparedWrites[device]
                 if (write != null) {
                     // Execute the queued write
                     val totalLength = write.segments.sumOf { it.second.size }
@@ -266,11 +264,9 @@ class BleServer: Closeable {
                     write.characteristic.onWrite?.invoke(device, assembledValue)
                 } else {
                     Log.w(TAG, "onExecuteWrite($device): no prepared write found")
+                    sendError(context, BluetoothGatt.GATT_REQUEST_NOT_SUPPORTED)
+                    return
                 }
-            }
-
-            synchronized(preparedWrites) {
-                preparedWrites.remove(device)
             }
 
             gattServer?.sendResponse(
@@ -330,7 +326,7 @@ class BleServer: Closeable {
 
         override fun onNotificationSent(device: BluetoothDevice, status: Int) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.i(TAG, "Notification sent to $device")
+                Log.d(TAG, "Notification sent to $device")
                 notificationSent.complete(Unit)
             } else {
                 Log.w(TAG, "Failed to send notification to $device: $status")
@@ -412,7 +408,6 @@ class BleServer: Closeable {
                 val characteristic = request.characteristic
 
                 if (getConnectionInfo(device)?.enabledNotifications?.get(characteristic.uuid) != true) {
-                    Log.w(TAG, "Notification not enabled for ${characteristic.uuid} on $device")
                     return@collect
                 }
 
@@ -425,7 +420,7 @@ class BleServer: Closeable {
                     Log.w(TAG, "Failed to notify characteristic changed")
                     return@collect
                 } else {
-                    Log.i(TAG, "Notification initiated for ${characteristic.uuid} to $device")
+                    Log.d(TAG, "Notification initiated for ${characteristic.uuid} to $device")
                 }
 
                 try {
