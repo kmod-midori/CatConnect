@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name" translatable="false">CatConnect</string>
     <string name="enable_service">Enable Service</string>
-    <string name="enable_service_desc">Receive notifications from iOS devices on this device.</string>
+    <string name="enable_service_desc">Receive notifications from compatible iOS or Android devices on this device.</string>
     <string name="bluetooth_disabled">Bluetooth is disabled or unavailable.</string>
     <string name="connected">Connected</string>
     <string name="connected_with_batt">Connected %d%%</string>

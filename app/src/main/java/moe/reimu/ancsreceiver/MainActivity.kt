@@ -266,9 +266,9 @@ fun MainActivityContent(mainViewModel: MainViewModel = viewModel()) {
                                         text = device.name,
                                         style = MaterialTheme.typography.titleMedium,
                                     )
-                                    Text(
-                                        text = device.device.address,
-                                    )
+//                                    Text(
+//                                        text = device.device.address,
+//                                    )
                                 }
                                 if (device.device.address == currentDeviceAddress) {
                                     Icon(
@@ -304,7 +304,7 @@ fun MainActivityContent(mainViewModel: MainViewModel = viewModel()) {
                 onDismissRequest = { showPairDialog = false },
                 onConfirmation = {
                     showPairDialog = false
-                    val intent = Intent(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS)
+                    val intent = Intent(Settings.ACTION_BLUETOOTH_SETTINGS)
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     context.startActivity(intent)
                 }

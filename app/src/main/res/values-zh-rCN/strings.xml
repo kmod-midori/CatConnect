@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="enable_service">启用服务</string>
-    <string name="enable_service_desc">在本设备上接收来自 iOS 设备的通知。</string>
+    <string name="enable_service_desc">在本设备上接收来自兼容的 iOS 或 Android 设备的通知。</string>
     <string name="bluetooth_disabled">蓝牙已关闭或不可用</string>
     <string name="connected">已连接</string>
     <string name="connected_with_batt">已连接 %d%%</string>
