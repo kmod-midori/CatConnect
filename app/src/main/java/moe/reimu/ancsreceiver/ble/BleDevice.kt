@@ -358,6 +358,7 @@ class BleDevice(private val nativeDevice: BluetoothDevice) : Closeable {
         get() = nativeDevice.address
 
     val name
+        @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
         get() = nativeDevice.name
 
     open class BleException(message: String) : Exception(message)
