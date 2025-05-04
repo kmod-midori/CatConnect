@@ -482,7 +482,7 @@ fun ServerServiceCard() {
         val enabledListeners = Settings.Secure.getString(
             context.contentResolver, "enabled_notification_listeners"
         )
-        enabled = enabledListeners.contains(context.packageName)
+        enabled = enabledListeners?.contains(context.packageName) == true
 
         onPauseOrDispose { }
     }
