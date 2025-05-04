@@ -774,7 +774,7 @@ class AncsService : Service() {
 
         BleDevice(device).use { bleDevice ->
             try {
-                withTimeout(5.minutes) {
+                withTimeout(1.minutes) {
                     bleDevice.connect(this@AncsService, true)
                 }
                 Log.i(TAG, "Connected to $device")
