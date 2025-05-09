@@ -12,10 +12,11 @@ import moe.reimu.ancsreceiver.BuildConfig
 const val BROADCAST_PERMISSION = "${BuildConfig.APPLICATION_ID}.INTERNAL_BROADCASTS"
 
 fun getRequiredPermissions(): List<String> {
-    val requiredPermissions = mutableListOf(
-        Manifest.permission.BLUETOOTH_SCAN,
-        Manifest.permission.BLUETOOTH_CONNECT,
-    )
+    val requiredPermissions = mutableListOf<String>()
+    if (Build.VERSION.SDK_INT >= 31) {
+        requiredPermissions.add(Manifest.permission.BLUETOOTH_SCAN)
+        requiredPermissions.add(Manifest.permission.BLUETOOTH_CONNECT)
+    }
     if (Build.VERSION.SDK_INT <= 32) {
         requiredPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION)
     }

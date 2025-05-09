@@ -16,6 +16,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.ServiceInfo
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
@@ -202,7 +203,7 @@ class AncsService : Service() {
                 ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
             )
         } catch (e: Exception) {
-            if (e is ForegroundServiceStartNotAllowedException) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && e is ForegroundServiceStartNotAllowedException) {
                 Log.e(TAG, "Service startup not allowed", e)
             } else {
                 Log.e(TAG, "Service startup failed", e)

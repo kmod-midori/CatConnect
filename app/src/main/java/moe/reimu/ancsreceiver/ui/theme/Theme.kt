@@ -36,12 +36,11 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun ANCSReceiverTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
-        dynamicColor -> {
+        Build.VERSION.SDK_INT >= 31 && dynamicColor -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
