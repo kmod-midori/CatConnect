@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "moe.reimu.ancsreceiver"
-        minSdk = 31
+        minSdk = 29
         targetSdk = 35
         versionCode = 2
         versionName = "1.1"

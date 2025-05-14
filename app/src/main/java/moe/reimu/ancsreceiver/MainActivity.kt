@@ -107,6 +107,7 @@ fun MainActivityContent(mainViewModel: MainViewModel = viewModel()) {
     var btErrorMessage by remember { mutableStateOf<Int?>(null) }
     val bluetoothConnectGranted =
         permissions.permissions.find { it.permission == Manifest.permission.BLUETOOTH_CONNECT }?.status
+
     DisposableEffect(bluetoothConnectGranted, context, isPreview) {
         fun updateBondedDevices() {
             if (isPreview) {
