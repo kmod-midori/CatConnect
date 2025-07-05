@@ -39,7 +39,6 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -52,6 +51,7 @@ import kotlinx.coroutines.withTimeout
 import moe.reimu.ancsreceiver.ancs.AncsConstants
 import moe.reimu.ancsreceiver.ble.BleDevice
 import moe.reimu.ancsreceiver.BuildConfig
+import moe.reimu.ancsreceiver.MainActivity
 import moe.reimu.ancsreceiver.MyApplication
 import moe.reimu.ancsreceiver.R
 import moe.reimu.ancsreceiver.ServiceState
@@ -918,6 +918,14 @@ class AncsService : Service() {
             }
         ).setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .addAction(R.drawable.ic_close, getString(R.string.stop), pi)
+            .setContentIntent(
+                PendingIntent.getActivity(
+                    this,
+                    0,
+                    Intent(this, MainActivity::class.java),
+                    PendingIntent.FLAG_IMMUTABLE
+                )
+            )
 
         if (connected) {
             builder.setSubText(deviceName)
