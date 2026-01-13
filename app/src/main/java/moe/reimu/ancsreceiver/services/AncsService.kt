@@ -667,6 +667,7 @@ class AncsService : Service() {
                 notification.setStyle(mediaStyle)
                 NotificationManagerCompat.from(this@AncsService)
                     .notify(NOTI_ID_MEDIA, notification.build())
+                mediaSession = currentSession
             }
         }
 
