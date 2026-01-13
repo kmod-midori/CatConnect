@@ -57,6 +57,7 @@ import moe.reimu.ancsreceiver.R
 import moe.reimu.ancsreceiver.ServiceState
 import moe.reimu.ancsreceiver.ams.AmsBleService
 import moe.reimu.ancsreceiver.ams.EntityUpdateNotification
+import moe.reimu.ancsreceiver.ancs.AncsActionLabels
 import moe.reimu.ancsreceiver.ancs.AncsBleService
 import moe.reimu.ancsreceiver.ancs.AppAttributeRequest
 import moe.reimu.ancsreceiver.ancs.AttributeRequest
@@ -375,7 +376,16 @@ class AncsService : Service() {
                                 negativeAction,
                                 getActionIntent(ACTION_NEGATIVE_ACTION, uid)
                             )
-                            builder.setDeleteIntent(getActionIntent(ACTION_NEGATIVE_ACTION, uid))
+
+                            // Set delete intent only when the negative action is "Clear"
+                            if (AncsActionLabels.isClearAction(negativeAction)) {
+                                builder.setDeleteIntent(
+                                    getActionIntent(
+                                        ACTION_NEGATIVE_ACTION,
+                                        uid
+                                    )
+                                )
+                            }
                         }
 
                         val contentLines = mutableListOf<String>()
