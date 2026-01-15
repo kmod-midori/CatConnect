@@ -656,14 +656,16 @@ class AncsService : Service() {
             }
 
             mediaSessionMutex.withLock {
-                val currentSession = mediaSession ?: MediaSessionCompat(this, "appleAms")
-                currentSession.apply {
+                if (mediaSession == null) {
+                    mediaSession = MediaSessionCompat(this, "appleAms")
+                }
+                mediaSession?.apply {
                     setCallback(sessionCallback, Handler(Looper.getMainLooper()))
                     setMetadata(metadata.build())
                     setPlaybackState(playbackStateCompat.build())
                     isActive = true
                 }
-                mediaStyle.setMediaSession(currentSession.sessionToken)
+                mediaStyle.setMediaSession(mediaSession?.sessionToken)
                 notification.setStyle(mediaStyle)
                 NotificationManagerCompat.from(this@AncsService)
                     .notify(NOTI_ID_MEDIA, notification.build())
