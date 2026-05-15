@@ -71,12 +71,14 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.launch
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import moe.reimu.ancsreceiver.services.AncsService
 import moe.reimu.ancsreceiver.ui.theme.ANCSReceiverTheme
+import moe.reimu.ancsreceiver.utils.LocalizedException
 import moe.reimu.ancsreceiver.utils.getReceiverFlags
 import moe.reimu.ancsreceiver.utils.getRequiredPermissions
 import moe.reimu.ancsreceiver.utils.registerInternalBroadcastReceiver
@@ -248,9 +250,13 @@ fun MainActivityContent(mainViewModel: MainViewModel = viewModel()) {
                                 scope.launch {
                                     snackbarHostState.showSnackbar(setupDoneMessage)
                                 }
-                            }, onFailed = {
+                            }, onFailed = { exception ->
                                 scope.launch {
-                                    val message = it.message
+                                    val message = when (exception) {
+                                        is LocalizedException -> exception.getLocalizedMessage(context)
+                                        is TimeoutCancellationException -> context.getString(R.string.device_setup_timeout)
+                                        else -> exception.message
+                                    }
                                     if (message != null) {
                                         snackbarHostState.showSnackbar(message)
                                     }

@@ -1,6 +1,6 @@
 [versions]
 accompanistPermissions = "0.37.2"
-agp = "8.9.2"
+agp = "8.13.0"
 kotlin = "2.1.20"
 coreKtx = "1.16.0"
 kotlinxCoroutinesAndroid = "1.9.0"
@@ -8,7 +8,6 @@ lifecycle = "2.8.7"
 activityCompose = "1.10.1"
 composeBom = "2025.04.01"
 lifecycleViewmodelCompose = "2.8.7"
-room = "2.7.1"
 runtimeLivedata = "1.8.0"
 ksp = "2.1.20-2.0.0"
 
@@ -20,9 +19,6 @@ androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
-androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
-androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
-androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 androidx-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata", version.ref = "runtimeLivedata" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }

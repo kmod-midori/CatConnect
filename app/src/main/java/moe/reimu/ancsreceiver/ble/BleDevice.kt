@@ -10,6 +10,7 @@ import android.bluetooth.BluetoothGattService
 import android.content.Context
 import android.util.Log
 import androidx.annotation.RequiresPermission
+import androidx.annotation.StringRes
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -17,6 +18,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.io.Closeable
 import java.util.UUID
+import moe.reimu.ancsreceiver.R
+import moe.reimu.ancsreceiver.utils.LocalizedException
 
 class BleDevice(private val nativeDevice: BluetoothDevice) : Closeable {
     private val TAG = "BleDevice"
@@ -166,7 +169,7 @@ class BleDevice(private val nativeDevice: BluetoothDevice) : Closeable {
     }
 
     private fun requireGatt() =
-        gatt ?: throw IllegalStateException("This device is closed or never connected")
+        gatt ?: throw BleException("This device is closed or never connected", R.string.ble_device_closed)
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     suspend fun connect(context: Context, autoConnect: Boolean) {
@@ -201,7 +204,7 @@ class BleDevice(private val nativeDevice: BluetoothDevice) : Closeable {
         mtuFuture = CompletableDeferred()
 
         if (!gatt.requestMtu(mtu)) {
-            throw BleException("Failed to request MTU")
+            throw BleException("Failed to request MTU", R.string.ble_request_mtu_failed)
         }
 
         return mtuFuture.await()
@@ -215,7 +218,7 @@ class BleDevice(private val nativeDevice: BluetoothDevice) : Closeable {
         servicesFuture = CompletableDeferred()
 
         if (!gatt.discoverServices()) {
-            throw BleException("Failed to discover services")
+            throw BleException("Failed to discover services", R.string.ble_discover_services_failed)
         }
 
         servicesFuture.await()
@@ -240,7 +243,7 @@ class BleDevice(private val nativeDevice: BluetoothDevice) : Closeable {
         }
 
         if (!gatt.readCharacteristic(characteristic)) {
-            throw BleException("Failed to read characteristic")
+            throw BleException("Failed to read characteristic", R.string.ble_read_characteristic_failed)
         }
 
         return future.await()
@@ -264,7 +267,7 @@ class BleDevice(private val nativeDevice: BluetoothDevice) : Closeable {
         }
 
         if (!gatt.writeCharacteristic(characteristic)) {
-            throw BleException("Failed to write characteristic")
+            throw BleException("Failed to write characteristic", R.string.ble_write_characteristic_failed)
         }
 
         future.await()
@@ -298,7 +301,7 @@ class BleDevice(private val nativeDevice: BluetoothDevice) : Closeable {
         }
 
         if (!gatt.writeDescriptor(descriptor)) {
-            throw BleException("Failed to initiate write descriptor")
+            throw BleException("Failed to initiate write descriptor", R.string.ble_write_descriptor_failed)
         }
 
         future.await()
@@ -316,11 +319,11 @@ class BleDevice(private val nativeDevice: BluetoothDevice) : Closeable {
         val gatt = requireGatt()
 
         if (!gatt.setCharacteristicNotification(characteristic, true)) {
-            throw BleException("Failed to enable notification")
+            throw BleException("Failed to enable notification", R.string.ble_enable_notification_failed)
         }
 
         val descriptor = characteristic.getDescriptor(clientConfigurationUuid)
-            ?: throw IllegalStateException("Notification descriptor not found")
+            ?: throw BleException("Notification descriptor not found", R.string.ble_notification_descriptor_not_found)
 
         descriptor.value = if (enabled) {
             BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
@@ -361,12 +364,16 @@ class BleDevice(private val nativeDevice: BluetoothDevice) : Closeable {
         @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
         get() = nativeDevice.name
 
-    open class BleException(message: String) : Exception(message)
-    class ConnectionFailedException(val status: Int) :
-        BleException("Connection failed with status $status")
+    open class BleException(
+        message: String,
+        @StringRes stringRes: Int,
+        vararg stringArgs: Any
+    ) : LocalizedException(message, stringRes, *stringArgs)
+    class ConnectionFailedException(status: Int) :
+        BleException("Connection failed with status $status", R.string.ble_connection_failed, status)
 
-    class OperationFailedException(val status: Int) :
-        BleException("Operation failed with status $status")
+    class OperationFailedException(status: Int) :
+        BleException("Operation failed with status $status", R.string.ble_operation_failed, status)
 
     companion object {
         val clientConfigurationUuid = UUID.fromString(

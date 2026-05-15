@@ -12,7 +12,7 @@
     <string name="perm_required">Permissions Required</string>
     <string name="perm_required_desc">One or more required permissions not granted, the app might not function normally. Click to grant these permissions.</string>
     <string name="pair_dialog_title">Pair a New Device</string>
-    <string name="pair_dialog_text">Open Bluetooth settings on your iOS device, and pair your iOS device with this device in settings. Tap \"OK\" to open Bluetooth settings of this device.</string>
+    <string name="pair_dialog_text">"Open Bluetooth settings, select the device you want to pair with, and complete pairing. Tap \"OK\" to open Bluetooth settings of this device. It is recommended to initiate pairing from this device instead of iOS devices. "</string>
     <string name="paired_devices">Paired Devices</string>
     <string name="fwd_group_desc">Forwarded Notifications</string>
     <string name="setup_connecting">Connecting</string>
@@ -23,4 +23,18 @@
     <string name="service_enabled">Enabled</string>
     <string name="server_service_name">Share notifications to paired devices</string>
     <string name="server_service_desc">Share notifications on this device to other compatible paired devices</string>
+
+    <!-- Error messages -->
+    <string name="ble_connection_failed">Connection failed (error code %d)</string>
+    <string name="ble_operation_failed">Operation failed (error code %d)</string>
+    <string name="ble_request_mtu_failed">Failed to negotiate connection parameters</string>
+    <string name="ble_discover_services_failed">Failed to discover device services</string>
+    <string name="ble_read_characteristic_failed">Failed to read from device</string>
+    <string name="ble_write_characteristic_failed">Failed to write to device</string>
+    <string name="ble_write_descriptor_failed">Failed to configure device</string>
+    <string name="ble_enable_notification_failed">Failed to enable notifications</string>
+    <string name="ble_device_closed">Device is disconnected</string>
+    <string name="ble_notification_descriptor_not_found">Device notification setup failed</string>
+    <string name="ancs_service_not_found">This device may not support notification forwarding. If connecting to an iOS device, forget the pairing on both devices and initiate pairing again from this device. If connecting to an Android device, check that notification sharing is enabled on the other device.</string>
+    <string name="device_setup_timeout">Device setup timed out</string>
 </resources>

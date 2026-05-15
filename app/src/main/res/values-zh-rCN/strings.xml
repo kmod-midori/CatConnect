@@ -12,7 +12,7 @@
     <string name="perm_required">需要授权</string>
     <string name="perm_required_desc">一个或多个必要权限未授予，本应用可能无法正常工作。点击以授予权限。</string>
     <string name="pair_dialog_title">配对新设备</string>
-    <string name="pair_dialog_text">请打开 iOS 设备的蓝牙设置，并将 iOS 设备与本设备配对。点击“确认”打开本设备的蓝牙设置。</string>
+    <string name="pair_dialog_text">打开蓝牙设置，选择要配对的设备并完成配对。点击“确认”打开本设备的蓝牙设置。建议从本设备而非 iOS 设备发起配对。</string>
     <string name="paired_devices">已配对的设备</string>
     <string name="fwd_group_desc">转发通知</string>
     <string name="setup_connecting">正在连接</string>
@@ -23,4 +23,18 @@
     <string name="service_enabled">已启用</string>
     <string name="server_service_name">向已配对的设备共享通知</string>
     <string name="server_service_desc">向已配对的兼容设备共享本设备的通知</string>
+
+    <!-- Error messages -->
+    <string name="ble_connection_failed">连接失败（错误代码 %d）</string>
+    <string name="ble_operation_failed">操作失败（错误代码 %d）</string>
+    <string name="ble_request_mtu_failed">协商连接参数失败</string>
+    <string name="ble_discover_services_failed">发现设备服务失败</string>
+    <string name="ble_read_characteristic_failed">读取设备数据失败</string>
+    <string name="ble_write_characteristic_failed">写入设备数据失败</string>
+    <string name="ble_write_descriptor_failed">配置设备失败</string>
+    <string name="ble_enable_notification_failed">启用通知失败</string>
+    <string name="ble_device_closed">设备未连接</string>
+    <string name="ble_notification_descriptor_not_found">设备通知配置失败</string>
+    <string name="ancs_service_not_found">此设备可能不支持通知转发。如果连接的是 iOS 设备，请在两端设备上取消配对，然后重新从本设备发起配对。如果连接的是 Android 设备，请检查对方设备是否已启用通知共享。</string>
+    <string name="device_setup_timeout">设备设置超时</string>
 </resources>

@@ -1,7 +1,9 @@
 package moe.reimu.ancsreceiver.ancs
 
 import android.bluetooth.BluetoothGattCharacteristic
+import moe.reimu.ancsreceiver.R
 import moe.reimu.ancsreceiver.ble.BleDevice
+import moe.reimu.ancsreceiver.utils.LocalizedException
 import java.util.UUID
 
 class AncsBleService(device: BleDevice) {
@@ -24,7 +26,8 @@ class AncsBleService(device: BleDevice) {
         this.dataSource = dataSource
     }
 
-    class ServiceNotFoundException : Exception("ANCS service not found")
+    class ServiceNotFoundException :
+        LocalizedException("ANCS service not found", R.string.ancs_service_not_found)
 
     companion object {
         val serviceUuid = UUID.fromString("7905F431-B5CE-4E99-A40F-4B1E122D00D0")
